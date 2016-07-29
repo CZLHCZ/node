@@ -13,5 +13,27 @@ Node 解决这个问题的方法是：更改连接到服务器的方式。每个
 现在您有了一个能处理数万个并发连接的程序，那么您能通过 Node 实际构建什么呢？如果您有一个 Web 应用程序需要处理这么多连接，那将是一件很 “恐怖” 的事！那是一种 “如果您有这个问题，那么它根本不是问题” 的问题。在回答上面的问题之前，我们先看看 Node 的工作原理以及它的设计运行方式。
 
 
+
 Node 肯定不是什么？
 没错，Node 是一个服务器程序。但是，基础 Node 产品肯定不 像 Apache 或 Tomcat。本质上，那些服务器 “安装就绪型” 服 务器产品，支持立即部署应用程序。通过这些产品，您可以在一分钟内启动并运行一个服务器。Node 肯定不是这种产品。Apache 能通过添加一个 PHP 模块来允许开发人员创建动态 Web 页，添加一个 SSL 模块来实现安全连接，与此类似，Node 也有模块概念，允许向 Node 内核添加模块。实际上，可供选择的用于 Node 的模块有数百个之多，社区在创建、发布和更新模块方面非常活跃，一天甚至可以处理数十个模块。本文后面将讨论 Node 的整个模块部分。
+
+Node 如何工作？
+Node 本身运行 V8 JavaScript。等等，服务器上的 JavaScript？没错，您没有看错。对于只在客户机上使用 JavaScript 的程序员而言，服务器端 JavaScript 可能是一个新概念，但这个概念本身并非遥不可及，因此为何不能在服务器上使用客户机上使用的编程语言？
+什么是 V8？V8 JavaScript 引擎是 Google 用于其 Chrome 浏览器的底层 JavaScript 引擎。很少有人考虑 JavaScript 在客户机上实际做了些什么？实际上，JavaScript 引擎负责解释并执行代码。Google 使用 V8 创建了一个用 C++ 编写的超快解释器，该解释器拥有另一个独特特征；您可以下载该引擎并将其嵌入任何 应用程序。V8 JavaScript 引擎并不仅限于在一个浏览器中运行。因此，Node 实际上会使用 Google 编写的 V8 JavaScript 引擎，并将其重建为可在服务器上使用。太完美了！既然已经有一个不错的解决方案可用，为何还要创建一种新语言呢？
+事件驱动编程
+许多程序员接受的教育使他们认为，面向对象编程是完美的编程设计，这使得他们对其他编程方法不屑一顾。Node 使用了一个所谓的事件驱动编程模型。
+清单 1. 客户端上使用 jQuery 的事件驱动编程
+// jQuery code on the client-side showing how Event-Driven programming works
+
+// When a button is pressed, an Event occurs - deal with it
+// directly right here in an anonymous function, where all the
+// necessary variables are present and can be referenced directly
+$("#myButton").click(function(){
+     if ($("#myTextField").val() != $(this).val())
+         alert("Field must match button text");
+});
+实际上，服务器端和客户端没有任何区别。没错，这没有按钮点击操作，也没有向文本字段键入的操作，但在一个更高的层面上，事件正在 发生。一个连接被建立，这是一个事件！数据通过连接进行接收，这也是一个事件！数据通过连接停止，这还是一个事件！
+为什么这种设置类型对 Node 很理想？JavaScript 是一种很棒的事件驱动编程语言，因为它允许使用匿名函数和闭包，更重要的是，任何写过代码的人都熟悉它的语法。事件发生时调用的回调函数可以在捕获事件处进行编写。这样可以使代码容易编写和维护，没有复杂的面向对象框架，没有接口，没有过度设计的可能性。只需监听事件，编写一个回调函数，其他事情都可以交给系统处理！
+
+
+
