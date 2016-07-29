@@ -35,5 +35,67 @@ $("#myButton").click(function(){
 实际上，服务器端和客户端没有任何区别。没错，这没有按钮点击操作，也没有向文本字段键入的操作，但在一个更高的层面上，事件正在 发生。一个连接被建立，这是一个事件！数据通过连接进行接收，这也是一个事件！数据通过连接停止，这还是一个事件！
 为什么这种设置类型对 Node 很理想？JavaScript 是一种很棒的事件驱动编程语言，因为它允许使用匿名函数和闭包，更重要的是，任何写过代码的人都熟悉它的语法。事件发生时调用的回调函数可以在捕获事件处进行编写。这样可以使代码容易编写和维护，没有复杂的面向对象框架，没有接口，没有过度设计的可能性。只需监听事件，编写一个回调函数，其他事情都可以交给系统处理！
 
+示例 Node 应用程序
+最后，我们来看一些代码！让我们将讨论过的所有内容汇总起来，从而创建我们的第一个 Node 应用程序。我们已经知道，Node 对于处理高流量应用程序很理想，所以我们将创建一个非常简单的 Web 应用程序，一个为实现最快速度而构建的应用程序。下面是 “老板” 交代的关于我们的样例应用程序的具体要求：创建一个随机数字生成器 RESTful API。这个应用程序应该接受一个输入：一个名为 “number” 的参数。然后，应用程序返回一个介于 0 和该参数之间的随机数字，并将生成的数字返回给调用者。由于 “老板” 希望该应用程序成为一个广泛流行的应用程序，因此它应该能处理 50,000 个并发用户。我们来看看以下代码：
+清单 2. Node 随机数字生成器
+// these modules need to be imported in order to use them.
+// Node has several modules.  They are like any #include
+// or import statement in other languages
+var http = require("http");
+var url = require("url");
+
+// The most important line in any Node file.  This function
+// does the actual process of creating the server.  Technically,
+// Node tells the underlying operating system that whenever a
+// connection is made, this particular callback function should be
+// executed.  Since we're creating a web service with REST API,
+// we want an HTTP server, which requires the http variable
+// we created in the lines above.
+// Finally, you can see that the callback method receives a 'request'
+// and 'response' object automatically.  This should be familiar
+// to any PHP or Java programmer.
+http.createServer(function(request, response) {
+
+     // The response needs to handle all the headers, and the return codes
+     // These types of things are handled automatically in server programs
+     // like Apache and Tomcat, but Node requires everything to be done yourself
+     response.writeHead(200, {"Content-Type": "text/plain"});
+
+     // Here is some unique-looking code.  This is how Node retrives
+     // parameters passed in from client requests.  The url module
+     // handles all these functions.  The parse function
+     // deconstructs the URL, and places the query key-values in the
+     // query object.  We can find the value for the "number" key
+     // by referencing it directly - the beauty of JavaScript.
+     var params = url.parse(request.url, true).query;
+     var input = params.number;
+
+     // These are the generic JavaScript methods that will create
+     // our random number that gets passed back to the caller
+     var numInput = new Number(input);
+     var numOutput = new Number(Math.random() * numInput).toFixed(0);
+     
+     // Write the random number to response
+     response.write(numOutput);
+     
+     // Node requires us to explicitly end this connection.  This is because
+     // Node allows you to keep a connection open and pass data back and forth,
+     // though that advanced topic isn't discussed in this article.
+     response.end();
+
+   // When we create the server, we have to explicitly connect the HTTP server to
+   // a port.  Standard HTTP port is 80, so we'll connect it to that one.
+}).listen(80);
+
+// Output a String to the console once the server starts up, letting us know everything
+// starts up correctly
+console.log("Random Number Generator Running...");
+启动应用程序
+将上面的代码放入一个名为 “random.js” 的文件中。现在，要启动这个应用程序并运行它（以便创建 HTTP 服务器并监听端口 80 上的连接），只需在您的命令提示中输入以下命令：% node random.js。下面是服务器已经启动并运行时看起来的样子：
+root@ubuntu:/home/moila/ws/mike# node random.js
+Random Number Generator Running...
+访问应用程序
+应用程序已经启动并运行。Node 正在监听所有连接，我们来测试一下。由于我们创建了一个简单的 RESTful API，所以可以使用 Web 浏览器来访问这个应用程序。键入以下地址（确保您已完成了上面的步骤）：http://localhost/?number=27。
+您的浏览器窗口将更改到一个介于 0 到 27 之间的随机数字。单击浏览器上的 “重新载入” 按钮，您会得到另一个随机数字。就是这样，这就是您的第一个 Node 应用程序！
 
 
